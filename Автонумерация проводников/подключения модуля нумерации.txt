@@ -1,0 +1,17 @@
+открываем файл автоматизация проектирования схем и одновременно тот документ куда необходимо импортировать макрос автонумерации
+сервис макрос редактор VB
+в редакторе тупо переносим все
+
+далее открываем thisdocumen и прописываем в нём:
+
+'Dim myMouseListener As MouseListener'
+Private Sub Document_DocumentSaved(ByVal doc As IVDocument)
+'Set myMouseListener = New MouseListener'
+End Sub
+Private Sub Document_BeforeDocumentClose(ByVal doc As IVDocument)
+   'Set myMouseListener = Nothing'
+End Sub
+Sub num()
+UserForm1.Show
+End Sub
+

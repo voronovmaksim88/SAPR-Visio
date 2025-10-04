@@ -20,6 +20,16 @@ Private Sub CheckBoxCheckBox_SensorType_Interfeis_Click()
 
 End Sub
 
+
+
+Private Sub ComboBox_Manufacturer_Change()
+    FilterSensors
+    Fill_ComboBox_SensorType
+    Fill_ComboBox_MeasuredValue
+    Fill_ComboBox_Model
+    Fill_ComboBox_Name
+End Sub
+
 Private Sub CommandButton_Cancel_Click()
     Unload Form_Sensors_PostgreSQL
 End Sub
@@ -42,7 +52,7 @@ Private Sub UserForm_Initialize()
     
     Fill_ComboBox_Manufacturer
     Fill_ComboBox_SensorType
-    Fill_Label_Num
+    Fill_Label_ShapeNum
     Fill_ComboBox_MeasuredValue
     Fill_ComboBox_Model
     Fill_ComboBox_Name
@@ -133,8 +143,8 @@ End Sub
 
 
 
-Private Sub Fill_Label_Num()
-' Safely set Label_Num.Caption if selection and user cells exist
+Private Sub Fill_Label_ShapeNum()
+' Safely set Label_ShapeNum.Caption if selection and user cells exist
     Dim sel As Object
     Set sel = Nothing
     On Error Resume Next
@@ -156,9 +166,9 @@ Private Sub Fill_Label_Num()
     Dim result As String
     If shapeType <> "" And shapeNum <> "" Then
         result = shapeType & shapeNum
-        Label_Num.Caption = result
+        Label_ShapeNum.Caption = result
     Else
-        Label_Num.Caption = ""
+        Label_ShapeNum.Caption = ""
     End If
 
 End Sub

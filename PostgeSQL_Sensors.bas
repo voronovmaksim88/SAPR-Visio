@@ -105,6 +105,32 @@ Sub ReadSensors()
             End If
             rsTypes.Close
             Set rsTypes = Nothing
+            ' --- New: fill SensorMeasuredValues array for this sensor (array of Long IDs) ---
+            Dim rsMeasuredValues As Object
+            Set rsMeasuredValues = CreateObject("ADODB.Recordset")
+            Dim sqlMeasuredValues As String
+            sqlMeasuredValues = "SELECT measured_value_id FROM sensor_measured_values_association WHERE sensor_id = " & .ID
+            rsMeasuredValues.Open sqlMeasuredValues, conn, 3, 1
+            If Not rsMeasuredValues.EOF Then
+                rsMeasuredValues.MoveLast
+                Dim mvCount As Long
+                mvCount = rsMeasuredValues.recordCount
+                rsMeasuredValues.MoveFirst
+                Dim arrMVIDs() As Long
+                ReDim arrMVIDs(0 To mvCount - 1)
+                Dim jMV As Long
+                jMV = 0
+                Do Until rsMeasuredValues.EOF
+                    arrMVIDs(jMV) = Nz(rsMeasuredValues.Fields("measured_value_id").value, 0)
+                    jMV = jMV + 1
+                    rsMeasuredValues.MoveNext
+                Loop
+                .SensorMeasuredValues = arrMVIDs
+            Else
+                ReDim .SensorMeasuredValues(-1 To -1) ' Empty array
+            End If
+            rsMeasuredValues.Close
+            Set rsMeasuredValues = Nothing
             ' --- End new ---
         End With
         ' Append to result string for display
@@ -125,6 +151,25 @@ Sub ReadSensors()
                 Next t
             Next k
         End If
+        ' Получаем строку с измеряемыми величинами
+        Dim measuredValueNames As String
+        measuredValueNames = ""
+        If UBound(Sensors(i).SensorMeasuredValues) >= 0 Then
+            Dim m As Long
+            For m = LBound(Sensors(i).SensorMeasuredValues) To UBound(Sensors(i).SensorMeasuredValues)
+                Dim mvID As Long
+                mvID = Sensors(i).SensorMeasuredValues(m)
+                Dim mv As Long
+                For mv = LBound(SensorMeasuredValues) To UBound(SensorMeasuredValues)
+                    If SensorMeasuredValues(mv).ID = mvID Then
+                        If measuredValueNames <> "" Then measuredValueNames = measuredValueNames & ", "
+                        measuredValueNames = measuredValueNames & SensorMeasuredValues(mv).Name
+                        Exit For
+                    End If
+                Next mv
+            Next m
+        End If
+        
         result = result & "ID: " & Sensors(i).ID & vbCrLf & _
                  "Name: " & Sensors(i).Name & vbCrLf & _
                  "Model: " & Sensors(i).Model & vbCrLf & _
@@ -135,7 +180,8 @@ Sub ReadSensors()
                  "Currency ID: " & Sensors(i).CurrencyID & vbCrLf & _
                  "Relevance: " & Sensors(i).Relevance & vbCrLf & _
                  "Price Date: " & Sensors(i).PriceDate & vbCrLf & _
-                 "Sensor Types: " & typeNames & vbCrLf & vbCrLf
+                 "Sensor Types: " & typeNames & vbCrLf & _
+                 "Measured Values: " & measuredValueNames & vbCrLf & vbCrLf
         i = i + 1
         rs.MoveNext
     Loop

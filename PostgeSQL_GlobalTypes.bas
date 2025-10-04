@@ -74,6 +74,16 @@ Public Type SensorsManufacturerRecord
     Name As String      ' name from manufacturers
 End Type
 
+Public Type SensorsType
+    ID As Long          ' id (primary key)
+    Name As String      ' name from manufacturers
+End Type
+
+Public Type SensorMeasuredValue
+    ID As Long          ' id (primary key)
+    Name As String
+End Type
+
 Public Type SensorRecord
     ID As Long
     Name As String
@@ -85,19 +95,11 @@ Public Type SensorRecord
     CurrencyID As Long
     Relevance As Boolean
     PriceDate As Date
-    ' Array of Sensor Type IDs (Long)
-    SensorTypes() As Long
+    SensorTypes() As Long ' Array of Sensor Type IDs (Long)
+    SensorMeasuredValues() As Long ' Array of Measured Values IDs (Long)
 End Type
 
-Public Type SensorsType
-    ID As Long          ' id (primary key)
-    Name As String      ' name from manufacturers
-End Type
 
-Public Type SensorMeasuredValue
-    ID As Long          ' id (primary key)
-    Name As String
-End Type
 
 
 

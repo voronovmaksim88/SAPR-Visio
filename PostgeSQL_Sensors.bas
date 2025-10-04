@@ -1,4 +1,5 @@
 Attribute VB_Name = "PostgeSQL_Sensors"
+
 Option Explicit
 
 ' Connection string (use the same as in other modules)
@@ -151,7 +152,7 @@ Sub ReadSensors()
                 Next t
             Next k
         End If
-        ' ÐŸÐ¾Ð»ÑƒÑ‡Ð°ÐµÐ¼ ÑÑ‚Ñ€Ð¾ÐºÑƒ Ñ Ð¸Ð·Ð¼ÐµÑ€ÑÐµÐ¼Ñ‹Ð¼Ð¸ Ð²ÐµÐ»Ð¸Ñ‡Ð¸Ð½Ð°Ð¼Ð¸
+        ' Ïîëó÷àåì ñòðîêó ñ èçìåðÿåìûìè âåëè÷èíàìè
         Dim measuredValueNames As String
         measuredValueNames = ""
         If UBound(Sensors(i).SensorMeasuredValues) >= 0 Then
@@ -379,6 +380,22 @@ Sub FilterSensors()
     For i = LBound(Sensors) To UBound(Sensors)
         FilteredSensors(i) = Sensors(i)
     Next i
+    
+    ' Get selected manufacturer from ComboBox
+    Dim selectedManufacturer As String
+    selectedManufacturer = Form_Sensors_PostgreSQL.ComboBox_Manufacturer.Text
+    ApplyManufacturerFilter selectedManufacturer
+    
+    ' Display final record count in LabelNum
+    Dim recordCount As Long
+    On Error Resume Next
+    recordCount = UBound(FilteredSensors) - LBound(FilteredSensors) + 1
+    If Err.Number <> 0 Then
+        recordCount = 0
+        Err.Clear
+    End If
+    On Error GoTo 0
+    Form_Sensors_PostgreSQL.Label_NumOfRecord.Caption = "Number of records: " & recordCount
 End Sub
 
 
@@ -390,6 +407,13 @@ Private Function Nz(value As Variant, default As Variant) As Variant
         Nz = value
     End If
 End Function
+
+Private Sub ApplyManufacturerFilter(selectedManufacturer As String)
+    ' If "all" is selected or empty, skip filtering
+    If selectedManufacturer = "all" Or selectedManufacturer = "" Then
+        Exit Sub
+    End If
+End Sub
 
 
 

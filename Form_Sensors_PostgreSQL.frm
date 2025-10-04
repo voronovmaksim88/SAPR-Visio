@@ -1,10 +1,10 @@
 VERSION 5.00
 Begin {C62A69F0-16DC-11CE-9E98-00AA00574A4F} Form_Sensors_PostgreSQL 
    Caption         =   "Choice sensor"
-   ClientHeight    =   7068
+   ClientHeight    =   8028
    ClientLeft      =   48
    ClientTop       =   492
-   ClientWidth     =   6852
+   ClientWidth     =   7140
    OleObjectBlob   =   "Form_Sensors_PostgreSQL.frx":0000
    StartUpPosition =   1  'CenterOwner
 End
@@ -14,6 +14,11 @@ Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
 
+
+
+Private Sub CheckBoxCheckBox_SensorType_Interfeis_Click()
+
+End Sub
 
 Private Sub CommandButton_Cancel_Click()
     Unload Form_Sensors_PostgreSQL

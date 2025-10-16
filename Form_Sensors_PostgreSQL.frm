@@ -2,8 +2,8 @@ VERSION 5.00
 Begin {C62A69F0-16DC-11CE-9E98-00AA00574A4F} Form_Sensors_PostgreSQL 
    Caption         =   "Choice sensor"
    ClientHeight    =   8028
-   ClientLeft      =   48
-   ClientTop       =   492
+   ClientLeft      =   45
+   ClientTop       =   495
    ClientWidth     =   7140
    OleObjectBlob   =   "Form_Sensors_PostgreSQL.frx":0000
    StartUpPosition =   1  'CenterOwner
@@ -13,6 +13,7 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
+
 
 
 
@@ -50,6 +51,8 @@ Private Sub UserForm_Initialize()
     ReadSensorMeasuredValue
     ReadSensors
     
+    FilterSensors
+    
     Fill_ComboBox_Manufacturer
     Fill_ComboBox_SensorType
     Fill_Label_ShapeNum
@@ -57,7 +60,7 @@ Private Sub UserForm_Initialize()
     Fill_ComboBox_Model
     Fill_ComboBox_Name
     
-    FilterSensors
+    
     
 
     

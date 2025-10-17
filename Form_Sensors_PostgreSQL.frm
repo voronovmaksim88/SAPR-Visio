@@ -1,7 +1,7 @@
 VERSION 5.00
 Begin {C62A69F0-16DC-11CE-9E98-00AA00574A4F} Form_Sensors_PostgreSQL 
    Caption         =   "Choice sensor"
-   ClientHeight    =   8028
+   ClientHeight    =   8025
    ClientLeft      =   45
    ClientTop       =   495
    ClientWidth     =   7140
@@ -47,8 +47,8 @@ Private Sub UserForm_Initialize()
     
     ' Load data from Sensors table into array when form starts
     ReadManufacturers
-    ReadSensorsType
     ReadSensorMeasuredValue
+    ReadSensorsType
     ReadSensors
     
     FilterSensors

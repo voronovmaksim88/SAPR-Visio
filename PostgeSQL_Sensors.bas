@@ -1,12 +1,8 @@
 Attribute VB_Name = "PostgeSQL_Sensors"
-
 Option Explicit
 
 ' Connection string (use the same as in other modules)
 Const CONNECTION_STRING As String = "DSN=PostgreSQL_Vizio_x32;Uid=kis3admin;Pwd=kis3admin1313#;"
-
-' Global array for storing sensor manufacturers
-Public SensorsManufacturers() As SensorsManufacturerRecord
 
 ' Global array for storing sensor types
 Public SensorsTypes() As SensorsType
@@ -152,7 +148,7 @@ Sub ReadSensors()
                 Next t
             Next k
         End If
-        ' ѕолучаем строку с измер€емыми величинами
+        ' ???????? ?????? ? ??????????? ??????????
         Dim measuredValueNames As String
         measuredValueNames = ""
         If UBound(Sensors(i).SensorMeasuredValues) >= 0 Then
@@ -363,8 +359,6 @@ End Sub
 
 
 
-
-
 Sub FilterSensors()
     ' Check if Sensors array is not empty
     If UBound(Sensors) < LBound(Sensors) Then
@@ -413,7 +407,67 @@ Private Sub ApplyManufacturerFilter(selectedManufacturer As String)
     If selectedManufacturer = "all" Or selectedManufacturer = "" Then
         Exit Sub
     End If
+    
+    ' Find ID of selected manufacturer
+    Dim targetManufacturerID As Long
+    targetManufacturerID = 0
+    Dim j As Long
+    
+    ' Check if Manufacturers array is empty
+    On Error Resume Next
+    If UBound(Manufacturers) < LBound(Manufacturers) Then
+        ' Array is empty, exit
+        Exit Sub
+    End If
+    On Error GoTo 0
+    
+    For j = LBound(Manufacturers) To UBound(Manufacturers)
+        If Manufacturers(j).Name = selectedManufacturer Then
+            targetManufacturerID = Manufacturers(j).ID
+            Exit For
+        End If
+    Next j
+    
+    ' If manufacturer not found, exit
+    If targetManufacturerID = 0 Then
+        Exit Sub
+    End If
+    
+    ' Filter records - keep only those where manufacturerID matches selected
+    Dim filteredCount As Long
+    filteredCount = 0
+    Dim tempArray() As SensorRecord
+    
+    ' Create temporary array for filtered records
+    ReDim tempArray(LBound(FilteredSensors) To UBound(FilteredSensors))
+    
+    ' Iterate through all records and copy only matching ones
+    Dim i As Long
+    For i = LBound(FilteredSensors) To UBound(FilteredSensors)
+        If FilteredSensors(i).manufacturerID = targetManufacturerID Then
+            tempArray(filteredCount) = FilteredSensors(i)
+            filteredCount = filteredCount + 1
+        End If
+    Next i
+    
+    ' Resize FilteredSensors to the number of found records
+    If filteredCount > 0 Then
+        ReDim FilteredSensors(0 To filteredCount - 1)
+        For i = 0 To filteredCount - 1
+            FilteredSensors(i) = tempArray(i)
+        Next i
+    Else
+        ' If nothing found, create empty array
+        ReDim FilteredSensors(0 To 0)
+        ' Set the array to empty by using Erase
+        Erase FilteredSensors
+    End If
+    
+    ' Clear temporary array
+    Erase tempArray
 End Sub
+
+
 
 
 

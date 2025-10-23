@@ -95,8 +95,9 @@ Public Type SensorRecord
     CurrencyID As Long
     Relevance As Boolean
     PriceDate As Date
-    SensorTypes() As Long ' Array of Sensor Type IDs (Long)
-    SensorMeasuredValues() As Long ' Array of Measured Values IDs (Long)
+    SensorTypeID As Long ' One sensor has ONE type (Many-to-One relationship)
+    ShapeTypeID As Long ' Shape type for Visio display
+    MeasuredValueIDs() As Long ' Array of Measured Values IDs (Many-to-Many)
 End Type
 
 

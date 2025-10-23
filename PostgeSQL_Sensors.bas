@@ -34,7 +34,8 @@ Sub ReadSensors()
     ' SQL query to get sensors from equipment table
     Dim sql As String
     sql = "SELECT e.id, e.name, e.model, e.vendor_code, e.description, " & _
-          "e.manufacturer_id, e.price, e.currency_id, e.relevance, e.price_date, e.discriminator " & _
+          "e.manufacturer_id, e.price, e.currency_id, e.relevance, e.price_date, e.discriminator, " & _
+          "s.sensor_type_id, s.sensors_shape_type_id " & _
           "FROM equipment e " & _
           "INNER JOIN sensors s ON e.id = s.id " & _
           "WHERE e.discriminator = 'sensor'"
@@ -76,96 +77,25 @@ Sub ReadSensors()
             .CurrencyID = Nz(rs.Fields("currency_id").value, 0)
             .Relevance = Nz(rs.Fields("relevance").value, True)
             .PriceDate = Nz(rs.Fields("price_date").value, #1/1/1900#)
-            ' --- New: fill SensorTypes array for this sensor (array of Long IDs) ---
-            Dim rsTypes As Object
-            Set rsTypes = CreateObject("ADODB.Recordset")
-            Dim sqlTypes As String
-            sqlTypes = "SELECT sensor_type_id FROM sensor_types_association WHERE sensor_id = " & .ID
-            rsTypes.Open sqlTypes, conn, 3, 1
-            If Not rsTypes.EOF Then
-                rsTypes.MoveLast
-                Dim typeCount As Long
-                typeCount = rsTypes.recordCount
-                rsTypes.MoveFirst
-                Dim arrTypeIDs() As Long
-                ReDim arrTypeIDs(0 To typeCount - 1)
-                Dim j As Long
-                j = 0
-                Do Until rsTypes.EOF
-                    arrTypeIDs(j) = Nz(rsTypes.Fields("sensor_type_id").value, 0)
-                    j = j + 1
-                    rsTypes.MoveNext
-                Loop
-                .SensorTypes = arrTypeIDs
-            Else
-                ReDim .SensorTypes(-1 To -1) ' Empty array
-            End If
-            rsTypes.Close
-            Set rsTypes = Nothing
-            ' --- New: fill SensorMeasuredValues array for this sensor (array of Long IDs) ---
-            Dim rsMeasuredValues As Object
-            Set rsMeasuredValues = CreateObject("ADODB.Recordset")
-            Dim sqlMeasuredValues As String
-            sqlMeasuredValues = "SELECT measured_value_id FROM sensor_measured_values_association WHERE sensor_id = " & .ID
-            rsMeasuredValues.Open sqlMeasuredValues, conn, 3, 1
-            If Not rsMeasuredValues.EOF Then
-                rsMeasuredValues.MoveLast
-                Dim mvCount As Long
-                mvCount = rsMeasuredValues.recordCount
-                rsMeasuredValues.MoveFirst
-                Dim arrMVIDs() As Long
-                ReDim arrMVIDs(0 To mvCount - 1)
-                Dim jMV As Long
-                jMV = 0
-                Do Until rsMeasuredValues.EOF
-                    arrMVIDs(jMV) = Nz(rsMeasuredValues.Fields("measured_value_id").value, 0)
-                    jMV = jMV + 1
-                    rsMeasuredValues.MoveNext
-                Loop
-                .SensorMeasuredValues = arrMVIDs
-            Else
-                ReDim .SensorMeasuredValues(-1 To -1) ' Empty array
-            End If
-            rsMeasuredValues.Close
-            Set rsMeasuredValues = Nothing
-            ' --- End new ---
+            ' Get sensor type ID directly from sensors table
+            .SensorTypeID = Nz(rs.Fields("sensor_type_id").value, 0)
+            ' Get shape type ID directly from sensors table
+            .ShapeTypeID = Nz(rs.Fields("sensors_shape_type_id").value, 0)
+            ' Initialize measured values array (will be populated if needed)
+            ReDim .MeasuredValueIDs(-1 To -1)
         End With
         ' Append to result string for display
-        Dim typeNames As String
-        typeNames = ""
-        If UBound(Sensors(i).SensorTypes) >= 0 Then
-            Dim k As Long
-            For k = LBound(Sensors(i).SensorTypes) To UBound(Sensors(i).SensorTypes)
-                Dim typeID As Long
-                typeID = Sensors(i).SensorTypes(k)
-                Dim t As Long
-                For t = LBound(SensorsTypes) To UBound(SensorsTypes)
-                    If SensorsTypes(t).ID = typeID Then
-                        If typeNames <> "" Then typeNames = typeNames & ", "
-                        typeNames = typeNames & SensorsTypes(t).Name
-                        Exit For
-                    End If
-                Next t
-            Next k
-        End If
-        ' ???????? ?????? ? ??????????? ??????????
-        Dim measuredValueNames As String
-        measuredValueNames = ""
-        If UBound(Sensors(i).SensorMeasuredValues) >= 0 Then
-            Dim m As Long
-            For m = LBound(Sensors(i).SensorMeasuredValues) To UBound(Sensors(i).SensorMeasuredValues)
-                Dim mvID As Long
-                mvID = Sensors(i).SensorMeasuredValues(m)
-                Dim mv As Long
-                For mv = LBound(SensorMeasuredValues) To UBound(SensorMeasuredValues)
-                    If SensorMeasuredValues(mv).ID = mvID Then
-                        If measuredValueNames <> "" Then measuredValueNames = measuredValueNames & ", "
-                        measuredValueNames = measuredValueNames & SensorMeasuredValues(mv).Name
-                        Exit For
-                    End If
-                Next mv
-            Next m
-        End If
+        Dim typeID As Long
+        typeID = Sensors(i).SensorTypeID
+        Dim typeName As String
+        typeName = ""
+        Dim t As Long
+        For t = LBound(SensorsTypes) To UBound(SensorsTypes)
+            If SensorsTypes(t).ID = typeID Then
+                typeName = SensorsTypes(t).Name
+                Exit For
+            End If
+        Next t
         
         result = result & "ID: " & Sensors(i).ID & vbCrLf & _
                  "Name: " & Sensors(i).Name & vbCrLf & _
@@ -177,8 +107,8 @@ Sub ReadSensors()
                  "Currency ID: " & Sensors(i).CurrencyID & vbCrLf & _
                  "Relevance: " & Sensors(i).Relevance & vbCrLf & _
                  "Price Date: " & Sensors(i).PriceDate & vbCrLf & _
-                 "Sensor Types: " & typeNames & vbCrLf & _
-                 "Measured Values: " & measuredValueNames & vbCrLf & vbCrLf
+                 "Sensor Type: " & typeName & vbCrLf & _
+                 "Shape Type ID: " & Sensors(i).ShapeTypeID & vbCrLf & vbCrLf
         i = i + 1
         rs.MoveNext
     Loop

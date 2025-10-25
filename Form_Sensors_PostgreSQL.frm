@@ -140,8 +140,75 @@ End Sub
 
 
 
-Private Sub Fill_ComboBox_SensorType()
 
+Private Sub Fill_ComboBox_SensorType()
+    ' Save current selected value
+    Dim currentValue As String
+    currentValue = ""
+    If ComboBox_SensorType.ListIndex >= 0 Then
+        currentValue = ComboBox_SensorType.Text
+    End If
+    
+    ' Declare variables
+    Dim i As Long
+    Dim j As Long
+    Dim uniqueSensorTypes As Collection
+    Set uniqueSensorTypes = New Collection
+    
+    On Error Resume Next ' Handle potential collection key conflicts
+    
+    ' Loop through FilteredSensors array to collect unique sensor type IDs
+    For i = LBound(FilteredSensors) To UBound(FilteredSensors)
+        ' Only add if SensorTypeID is not 0 (non-Null)
+        If FilteredSensors(i).SensorTypeID <> 0 Then
+            uniqueSensorTypes.Add FilteredSensors(i).SensorTypeID, CStr(FilteredSensors(i).SensorTypeID)
+        End If
+    Next i
+    
+    On Error GoTo ErrorHandler
+    
+    ' Clear existing items in ComboBox
+    ComboBox_SensorType.Clear
+    
+    ' Add "all" as the first option
+    ComboBox_SensorType.AddItem "all"
+    
+    ' Loop through unique sensor type IDs and match with SensorsTypes array
+    For i = 1 To uniqueSensorTypes.Count
+        ' Find matching sensor type name
+        For j = LBound(SensorsTypes) To UBound(SensorsTypes)
+            If SensorsTypes(j).ID = uniqueSensorTypes(i) Then
+                ' Add sensor type name to ComboBox
+                ComboBox_SensorType.AddItem SensorsTypes(j).Name
+                Exit For
+            End If
+        Next j
+    Next i
+    
+    ' Try to restore previous selection
+    Dim foundIndex As Long
+    foundIndex = -1
+    If currentValue <> "" Then
+        For i = 0 To ComboBox_SensorType.ListCount - 1
+            If ComboBox_SensorType.List(i) = currentValue Then
+                foundIndex = i
+                Exit For
+            End If
+        Next i
+    End If
+    
+    ' Set selection: restore previous if found, otherwise set to "all"
+    If foundIndex >= 0 Then
+        ComboBox_SensorType.ListIndex = foundIndex
+    Else
+        ComboBox_SensorType.ListIndex = 0  ' "all"
+    End If
+    
+    Exit Sub
+
+ErrorHandler:
+    MsgBox "An error occurred while filling the sensor type ComboBox: " & Err.Description, vbCritical, "Error"
+    Set uniqueSensorTypes = Nothing
 End Sub
 
 
@@ -359,4 +426,6 @@ Private Sub Fill_ComboBox_Name()
         ComboBox_Name.ListIndex = 0  ' "all"
     End If
 End Sub
+
+
     

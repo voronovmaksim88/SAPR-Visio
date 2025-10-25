@@ -13,6 +13,8 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
+' Flag to prevent recursive event handling during programmatic updates
+Private isUpdatingFilters As Boolean
 
 
 
@@ -24,11 +26,28 @@ End Sub
 
 
 Private Sub ComboBox_Manufacturer_Change()
+    ' Prevent recursive calls during programmatic updates
+    If isUpdatingFilters Then Exit Sub
+    
+    isUpdatingFilters = True
     FilterSensors
     Fill_ComboBox_SensorType
     Fill_ComboBox_MeasuredValue
     Fill_ComboBox_Model
     Fill_ComboBox_Name
+    isUpdatingFilters = False
+End Sub
+
+Private Sub ComboBox_SensorType_Change()
+    ' Prevent recursive calls during programmatic updates
+    If isUpdatingFilters Then Exit Sub
+    
+    isUpdatingFilters = True
+    FilterSensors
+    Fill_ComboBox_MeasuredValue
+    Fill_ComboBox_Model
+    Fill_ComboBox_Name
+    isUpdatingFilters = False
 End Sub
 
 Private Sub CommandButton_Cancel_Click()
@@ -45,6 +64,9 @@ End Sub
 Private Sub UserForm_Initialize()
     MyDebug = True
     
+    ' Set flag to prevent Change events during initialization
+    isUpdatingFilters = True
+    
     ' Load data from Sensors table into array when form starts
     ReadManufacturers
     ReadSensorMeasuredValue
@@ -60,9 +82,8 @@ Private Sub UserForm_Initialize()
     Fill_ComboBox_Model
     Fill_ComboBox_Name
     
-    
-    
-
+    ' Enable Change events after initialization is complete
+    isUpdatingFilters = False
     
 End Sub
 
@@ -429,3 +450,4 @@ End Sub
 
 
     
+

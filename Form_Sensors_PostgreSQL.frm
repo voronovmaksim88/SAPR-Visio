@@ -266,43 +266,7 @@ End Sub
 
 
 Private Sub Fill_ComboBox_MeasuredValue()
-    ' Save current selected value
-    Dim currentValue As String
-    currentValue = ""
-    If ComboBox_MeasuredValue.ListIndex >= 0 Then
-        currentValue = ComboBox_MeasuredValue.Text
-    End If
-    
-    ' Clear existing items in ComboBox
-    ComboBox_MeasuredValue.Clear
-    
-    ' Add "all" as the first option
-    ComboBox_MeasuredValue.AddItem "all"
-    
-    ' Add measured values from SensorMeasuredValues array
-    Dim i As Long
-    For i = LBound(SensorMeasuredValues) To UBound(SensorMeasuredValues)
-        ComboBox_MeasuredValue.AddItem SensorMeasuredValues(i).Name
-    Next i
-    
-    ' Try to restore previous selection
-    Dim foundIndex As Long
-    foundIndex = -1
-    If currentValue <> "" Then
-        For i = 0 To ComboBox_MeasuredValue.ListCount - 1
-            If ComboBox_MeasuredValue.List(i) = currentValue Then
-                foundIndex = i
-                Exit For
-            End If
-        Next i
-    End If
-    
-    ' Set selection: restore previous if found, otherwise set to "all"
-    If foundIndex >= 0 Then
-        ComboBox_MeasuredValue.ListIndex = foundIndex
-    Else
-        ComboBox_MeasuredValue.ListIndex = 0  ' "all"
-    End If
+
 End Sub
 
 

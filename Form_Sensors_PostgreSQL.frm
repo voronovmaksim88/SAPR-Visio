@@ -81,6 +81,7 @@ Private Sub UserForm_Initialize()
     Fill_ComboBox_MeasuredValue
     Fill_ComboBox_Model
     Fill_ComboBox_Name
+    Fill_ComboBoxes_SensorMeasuredValue
     
     ' Enable Change events after initialization is complete
     isUpdatingFilters = False
@@ -413,5 +414,23 @@ Private Sub Fill_ComboBox_Name()
 End Sub
 
 
+Private Sub Fill_ComboBoxes_SensorMeasuredValue()
+    ' Calculate the length of SensorMeasuredValues array
+    Dim arrayLength As Long
+    
+    On Error Resume Next
+    arrayLength = UBound(SensorMeasuredValues) - LBound(SensorMeasuredValues) + 1
+    
+    ' Check if there was an error (array not initialized)
+    If Err.Number <> 0 Then
+        arrayLength = 0
+        MsgBox "SensorMeasuredValues array is not initialized. Length: 0", vbInformation, "Array Length"
+    Else
+        ' Display the length in a message
+        MsgBox "SensorMeasuredValues array length: " & arrayLength, vbInformation, "Array Length"
+    End If
+    
+    On Error GoTo 0
+End Sub
     
 

@@ -35,7 +35,7 @@ Sub ReadSensors()
     Dim sql As String
     sql = "SELECT e.id, e.name, e.model, e.vendor_code, e.description, " & _
           "e.manufacturer_id, e.price, e.currency_id, e.relevance, e.price_date, e.discriminator, " & _
-          "s.sensor_type_id, s.sensors_shape_type_id " & _
+          "s.sensor_type_id, s.sensors_shape_type_id, s.measured_value_id " & _
           "FROM equipment e " & _
           "INNER JOIN sensors s ON e.id = s.id " & _
           "WHERE e.discriminator = 'sensor'"
@@ -81,8 +81,8 @@ Sub ReadSensors()
             .SensorTypeID = Nz(rs.Fields("sensor_type_id").value, 0)
             ' Get shape type ID directly from sensors table
             .ShapeTypeID = Nz(rs.Fields("sensors_shape_type_id").value, 0)
-            ' Initialize measured values array (will be populated if needed)
-            ReDim .MeasuredValueIDs(-1 To -1)
+            ' Get measured value ID directly from sensors table
+            .MeasuredValueID = Nz(rs.Fields("measured_value_id").value, 0)
         End With
         ' Append to result string for display
         Dim typeID As Long

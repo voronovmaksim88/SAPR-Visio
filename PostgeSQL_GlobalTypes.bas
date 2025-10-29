@@ -66,14 +66,7 @@ End Type
 
 
 
-
 ' For Sensors
-' Define user type for storing one record from Manufacturers table
-Public Type SensorsManufacturerRecord
-    ID As Long          ' id (primary key)
-    Name As String      ' name from manufacturers
-End Type
-
 Public Type SensorsType
     ID As Long          ' id (primary key)
     Name As String      ' name from manufacturers
@@ -97,8 +90,9 @@ Public Type SensorRecord
     PriceDate As Date
     SensorTypeID As Long ' One sensor has ONE type (Many-to-One relationship)
     ShapeTypeID As Long ' Shape type for Visio display
-    MeasuredValueIDs() As Long ' Array of Measured Values IDs (Many-to-Many)
+    MeasuredValueID As Long ' One sensor has ONE measured value (Many-to-One relationship)
 End Type
+
 
 
 

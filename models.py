@@ -690,7 +690,8 @@ class SensorMeasuredValues(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     name: Mapped[str] = mapped_column(String(64), nullable=False, unique=True, index=True)
     
-    # Отношения определены через backref в классе Sensor
+    # Отношения
+    sensors: Mapped[List["Sensor"]] = relationship(back_populates="measured_value")
     
     def __str__(self) -> str:
         return self.name
@@ -732,15 +733,6 @@ class SensorsShapeType(Base):
         return self.name
 
 
-# Промежуточная таблица для связи многие-ко-многим между Sensor и SensorMeasuredValues
-sensor_measured_values_association = Table(
-    'sensor_measured_values_association',
-    Base.metadata,
-    Column('sensor_id', Integer, ForeignKey('sensors.id'), primary_key=True),
-    Column('measured_value_id', Integer, ForeignKey('sensor_measured_values.id'), primary_key=True)
-)
-
-
 class Sensor(Equipment):
     """
     Датчики
@@ -760,6 +752,10 @@ class Sensor(Equipment):
     sensor_type_id: Mapped[Optional[int]] = mapped_column(ForeignKey('sensor_types.id'), nullable=True)
     # Каждый датчик имеет ТОЛЬКО ОДИН тип
     
+    # Связь с измеряемым значением (один-ко-многим)
+    measured_value_id: Mapped[Optional[int]] = mapped_column(ForeignKey('sensor_measured_values.id'), nullable=True)
+    # Каждый датчик имеет ТОЛЬКО ОДНО измеряемое значение
+    
     # Отношения
     shape_type: Mapped[Optional["SensorsShapeType"]] = relationship(back_populates="sensors")
     # Один датчик ссылается на один тип отображения
@@ -767,8 +763,5 @@ class Sensor(Equipment):
     sensor_type: Mapped[Optional["SensorTypes"]] = relationship(back_populates="sensors")
     # Один датчик имеет один тип
     
-    # Связь многие-ко-многим с измеряемыми значениями
-    measured_values: Mapped[List["SensorMeasuredValues"]] = relationship(
-        secondary=sensor_measured_values_association,
-        backref="sensors"
-    )
+    measured_value: Mapped[Optional["SensorMeasuredValues"]] = relationship(back_populates="sensors")
+    # Один датчик имеет одно измеряемое значение

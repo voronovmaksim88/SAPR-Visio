@@ -1,7 +1,7 @@
 VERSION 5.00
 Begin {C62A69F0-16DC-11CE-9E98-00AA00574A4F} Form_Sensors_PostgreSQL 
    Caption         =   "Choice sensor"
-   ClientHeight    =   8865
+   ClientHeight    =   6510
    ClientLeft      =   45
    ClientTop       =   495
    ClientWidth     =   6600
@@ -17,14 +17,6 @@ Attribute VB_Exposed = False
 Private isUpdatingFilters As Boolean
 
 
-
-
-Private Sub CheckBoxCheckBox_SensorType_Interfeis_Click()
-
-End Sub
-
-
-
 Private Sub ComboBox_Manufacturer_Change()
     ' Prevent recursive calls during programmatic updates
     If isUpdatingFilters Then Exit Sub
@@ -32,7 +24,7 @@ Private Sub ComboBox_Manufacturer_Change()
     isUpdatingFilters = True
     FilterSensors
     Fill_ComboBox_SensorType
-    Fill_ComboBox_MeasuredValue
+    Fill_ComboBox_SensorMeasuredValue
     Fill_ComboBox_Model
     Fill_ComboBox_Name
     isUpdatingFilters = False
@@ -44,7 +36,7 @@ Private Sub ComboBox_SensorType_Change()
     
     isUpdatingFilters = True
     FilterSensors
-    Fill_ComboBox_MeasuredValue
+    Fill_ComboBox_SensorMeasuredValue
     Fill_ComboBox_Model
     Fill_ComboBox_Name
     isUpdatingFilters = False
@@ -67,21 +59,22 @@ Private Sub UserForm_Initialize()
     ' Set flag to prevent Change events during initialization
     isUpdatingFilters = True
     
-    ' Load data from Sensors table into array when form starts
-    ReadManufacturers
-    ReadSensorMeasuredValue
-    ReadSensorsType
-    ReadSensors
+    ' Load data from database only if not already loaded (optimization)
+    On Error Resume Next
+    If UBound(Manufacturers) < 0 Then ReadManufacturers
+    If UBound(SensorMeasuredValues) < 0 Then ReadSensorMeasuredValue
+    If UBound(SensorsTypes) < 0 Then ReadSensorsType
+    If UBound(Sensors) < 0 Then ReadSensors
+    On Error GoTo 0
     
     FilterSensors
     
     Fill_ComboBox_Manufacturer
     Fill_ComboBox_SensorType
     Fill_Label_ShapeNum
-    Fill_ComboBox_MeasuredValue
     Fill_ComboBox_Model
     Fill_ComboBox_Name
-    Fill_ComboBoxes_SensorMeasuredValue
+    Fill_ComboBox_SensorMeasuredValue
     
     ' Enable Change events after initialization is complete
     isUpdatingFilters = False
@@ -266,10 +259,6 @@ Private Sub Fill_Label_ShapeNum()
 End Sub
 
 
-Private Sub Fill_ComboBox_MeasuredValue()
-
-End Sub
-
 
 
 Private Sub Fill_ComboBox_Model()
@@ -414,23 +403,76 @@ Private Sub Fill_ComboBox_Name()
 End Sub
 
 
-Private Sub Fill_ComboBoxes_SensorMeasuredValue()
-    ' Calculate the length of SensorMeasuredValues array
-    Dim arrayLength As Long
-    
-    On Error Resume Next
-    arrayLength = UBound(SensorMeasuredValues) - LBound(SensorMeasuredValues) + 1
-    
-    ' Check if there was an error (array not initialized)
-    If Err.Number <> 0 Then
-        arrayLength = 0
-        MsgBox "SensorMeasuredValues array is not initialized. Length: 0", vbInformation, "Array Length"
-    Else
-        ' Display the length in a message
-        MsgBox "SensorMeasuredValues array length: " & arrayLength, vbInformation, "Array Length"
+
+
+Private Sub Fill_ComboBox_SensorMeasuredValue()
+    ' Save current selected value
+    Dim currentValue As String
+    currentValue = ""
+    If ComboBox_SensorMeasuredValue.ListIndex >= 0 Then
+        currentValue = ComboBox_SensorMeasuredValue.Text
     End If
     
-    On Error GoTo 0
-End Sub
+    ' Declare variables
+    Dim i As Long
+    Dim j As Long
+    Dim uniqueMeasuredValues As Collection
+    Set uniqueMeasuredValues = New Collection
     
+    On Error Resume Next ' Handle potential collection key conflicts
+    
+    ' Loop through FilteredSensors array to collect unique measured value IDs
+    For i = LBound(FilteredSensors) To UBound(FilteredSensors)
+        ' Only add if MeasuredValueID is not 0 (non-Null)
+        If FilteredSensors(i).MeasuredValueID <> 0 Then
+            uniqueMeasuredValues.Add FilteredSensors(i).MeasuredValueID, CStr(FilteredSensors(i).MeasuredValueID)
+        End If
+    Next i
+    
+    On Error GoTo ErrorHandler
+    
+    ' Clear existing items in ComboBox
+    ComboBox_SensorMeasuredValue.Clear
+    
+    ' Add "all" as the first option
+    ComboBox_SensorMeasuredValue.AddItem "all"
+    
+    ' Loop through unique measured value IDs and match with SensorMeasuredValues array
+    For i = 1 To uniqueMeasuredValues.Count
+        ' Find matching measured value name
+        For j = LBound(SensorMeasuredValues) To UBound(SensorMeasuredValues)
+            If SensorMeasuredValues(j).ID = uniqueMeasuredValues(i) Then
+                ' Add measured value name to ComboBox
+                ComboBox_SensorMeasuredValue.AddItem SensorMeasuredValues(j).Name
+                Exit For
+            End If
+        Next j
+    Next i
+    
+    ' Try to restore previous selection
+    Dim foundIndex As Long
+    foundIndex = -1
+    If currentValue <> "" Then
+        For i = 0 To ComboBox_SensorMeasuredValue.ListCount - 1
+            If ComboBox_SensorMeasuredValue.List(i) = currentValue Then
+                foundIndex = i
+                Exit For
+            End If
+        Next i
+    End If
+    
+    ' Set selection: restore previous if found, otherwise set to "all"
+    If foundIndex >= 0 Then
+        ComboBox_SensorMeasuredValue.ListIndex = foundIndex
+    Else
+        ComboBox_SensorMeasuredValue.ListIndex = 0  ' "all"
+    End If
+    
+    Exit Sub
+
+ErrorHandler:
+    MsgBox "An error occurred while filling the measured value ComboBox: " & Err.Description, vbCritical, "Error"
+    Set uniqueMeasuredValues = Nothing
+End Sub
+
 

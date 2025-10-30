@@ -63,8 +63,12 @@ End Sub
 
 
 
-Private Sub Label5_Click()
-
+Private Sub CommandButton_OK_Click()
+    If (ComboBox_Model.Text <> "") Then
+     ActiveWindow.Selection.PrimaryItem.Cells("prop.Manufacturer").FormulaU = Chr(34) + ComboBox_Manufacturer.Text + Chr(34)
+    End If 'Model ComboBox is Empty
+    
+    Unload Form_Sensors_PostgreSQL
 End Sub
 
 Private Sub UserForm_Initialize()

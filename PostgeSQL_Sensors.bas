@@ -315,6 +315,12 @@ Sub FilterSensors()
     selectedSensorType = Form_Sensors_PostgreSQL.ComboBox_SensorType.Text
     ApplySensorTypeFilter selectedSensorType
     
+    ' Get selected measured value from ComboBox and apply filter if needed
+    Dim selectedMeasuredValue As String
+    selectedMeasuredValue = Form_Sensors_PostgreSQL.ComboBox_SensorMeasuredValue.Text
+    ApplyMeasuredValueFilter selectedMeasuredValue
+    
+    
     ' Display final record count in LabelNum
     Dim recordCount As Long
     On Error Resume Next
@@ -469,6 +475,77 @@ End Sub
 
 
 
+
+Private Sub ApplyMeasuredValueFilter(selectedMeasuredValue As String)
+    ' If "all" is selected or empty, skip filtering
+    If selectedMeasuredValue = "all" Or selectedMeasuredValue = "" Then
+        Exit Sub
+    End If
+    
+    ' Find ID of selected measured value
+    Dim targetMeasuredValueID As Long
+    targetMeasuredValueID = 0
+    Dim j As Long
+    
+    ' Check if SensorMeasuredValues array is empty
+    On Error Resume Next
+    If UBound(SensorMeasuredValues) < LBound(SensorMeasuredValues) Then
+        ' Array is empty, exit
+        Exit Sub
+    End If
+    On Error GoTo 0
+    
+    For j = LBound(SensorMeasuredValues) To UBound(SensorMeasuredValues)
+        If SensorMeasuredValues(j).Name = selectedMeasuredValue Then
+            targetMeasuredValueID = SensorMeasuredValues(j).ID
+            Exit For
+        End If
+    Next j
+    
+    ' If measured value not found, exit
+    If targetMeasuredValueID = 0 Then
+        Exit Sub
+    End If
+    
+    ' Filter records - keep only those where MeasuredValueID matches selected
+    Dim filteredCount As Long
+    filteredCount = 0
+    Dim tempArray() As SensorRecord
+    
+    ' Create temporary array for filtered records
+    On Error Resume Next
+    ReDim tempArray(LBound(FilteredSensors) To UBound(FilteredSensors))
+    If Err.Number <> 0 Then
+        ' Array is empty, nothing to filter
+        Exit Sub
+    End If
+    On Error GoTo 0
+    
+    ' Iterate through all records and copy only matching ones
+    Dim i As Long
+    For i = LBound(FilteredSensors) To UBound(FilteredSensors)
+        If FilteredSensors(i).MeasuredValueID = targetMeasuredValueID Then
+            tempArray(filteredCount) = FilteredSensors(i)
+            filteredCount = filteredCount + 1
+        End If
+    Next i
+    
+    ' Resize FilteredSensors to the number of found records
+    If filteredCount > 0 Then
+        ReDim FilteredSensors(0 To filteredCount - 1)
+        For i = 0 To filteredCount - 1
+            FilteredSensors(i) = tempArray(i)
+        Next i
+    Else
+        ' If nothing found, create empty array
+        ReDim FilteredSensors(0 To 0)
+        ' Set the array to empty by using Erase
+        Erase FilteredSensors
+    End If
+    
+    ' Clear temporary array
+    Erase tempArray
+End Sub
 
 
 

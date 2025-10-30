@@ -1,10 +1,10 @@
 VERSION 5.00
 Begin {C62A69F0-16DC-11CE-9E98-00AA00574A4F} Form_Sensors_PostgreSQL 
    Caption         =   "Choice sensor"
-   ClientHeight    =   6510
+   ClientHeight    =   7200
    ClientLeft      =   45
    ClientTop       =   495
-   ClientWidth     =   6600
+   ClientWidth     =   7680
    OleObjectBlob   =   "Form_Sensors_PostgreSQL.frx":0000
    StartUpPosition =   1  'CenterOwner
 End
@@ -30,6 +30,8 @@ Private Sub ComboBox_Manufacturer_Change()
     isUpdatingFilters = False
 End Sub
 
+
+
 Private Sub ComboBox_SensorType_Change()
     ' Prevent recursive calls during programmatic updates
     If isUpdatingFilters Then Exit Sub
@@ -37,6 +39,18 @@ Private Sub ComboBox_SensorType_Change()
     isUpdatingFilters = True
     FilterSensors
     Fill_ComboBox_SensorMeasuredValue
+    Fill_ComboBox_Model
+    Fill_ComboBox_Name
+    isUpdatingFilters = False
+End Sub
+
+Private Sub ComboBox_SensorMeasuredValue_Change()
+    ' Prevent recursive calls during programmatic updates
+    If isUpdatingFilters Then Exit Sub
+    
+    isUpdatingFilters = True
+    FilterSensors
+    Fill_ComboBox_SensorType
     Fill_ComboBox_Model
     Fill_ComboBox_Name
     isUpdatingFilters = False

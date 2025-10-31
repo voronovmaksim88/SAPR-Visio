@@ -35,6 +35,8 @@ End Sub
 
 
 
+
+
 Private Sub ComboBox_SensorType_Change()
     ' Prevent recursive calls during programmatic updates
     If isUpdatingFilters Then Exit Sub
@@ -76,6 +78,21 @@ Private Sub ComboBox_Model_Change()
     Fill_ComboBox_SensorType
     Fill_ComboBox_SensorMeasuredValue
     Fill_ComboBox_Name
+    SetSingleOptionIfAvailable
+    isUpdatingFilters = False
+End Sub
+
+Private Sub ComboBox_Name_Change()
+    ' Prevent recursive calls during programmatic updates
+    If isUpdatingFilters Then Exit Sub
+    
+    isUpdatingFilters = True
+    FilterSensors
+    
+    Fill_ComboBox_Manufacturer
+    Fill_ComboBox_SensorType
+    Fill_ComboBox_SensorMeasuredValue
+    Fill_ComboBox_Model
     SetSingleOptionIfAvailable
     isUpdatingFilters = False
 End Sub

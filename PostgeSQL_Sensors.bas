@@ -325,6 +325,11 @@ Sub FilterSensors()
     selectedModel = Form_Sensors_PostgreSQL.ComboBox_Model.Text
     ApplyModelFilter selectedModel
     
+    ' Get selected name from ComboBox and apply filter if needed
+    Dim selectedName As String
+    selectedName = Form_Sensors_PostgreSQL.ComboBox_Name.Text
+    ApplyNameFilter selectedName
+    
     ' Display final record count in LabelNum
     Dim recordCount As Long
     On Error Resume Next
@@ -598,5 +603,53 @@ Private Sub ApplyModelFilter(selectedModel As String)
     ' Clear temporary array
     Erase tempArray
 End Sub
+
+
+Private Sub ApplyNameFilter(selectedName As String)
+    ' If "all" is selected or empty, skip filtering
+    If selectedName = "all" Or selectedName = "" Then
+        Exit Sub
+    End If
+    
+    ' Filter records - keep only those where Name matches selected
+    Dim filteredCount As Long
+    filteredCount = 0
+    Dim tempArray() As SensorRecord
+    
+    ' Create temporary array for filtered records
+    On Error Resume Next
+    ReDim tempArray(LBound(FilteredSensors) To UBound(FilteredSensors))
+    If Err.Number <> 0 Then
+        ' Array is empty, nothing to filter
+        Exit Sub
+    End If
+    On Error GoTo 0
+    
+    ' Iterate through all records and copy only matching ones
+    Dim i As Long
+    For i = LBound(FilteredSensors) To UBound(FilteredSensors)
+        If FilteredSensors(i).Name = selectedName Then
+            tempArray(filteredCount) = FilteredSensors(i)
+            filteredCount = filteredCount + 1
+        End If
+    Next i
+    
+    ' Resize FilteredSensors to the number of found records
+    If filteredCount > 0 Then
+        ReDim FilteredSensors(0 To filteredCount - 1)
+        For i = 0 To filteredCount - 1
+            FilteredSensors(i) = tempArray(i)
+        Next i
+    Else
+        ' If nothing found, create empty array
+        ReDim FilteredSensors(0 To 0)
+        ' Set the array to empty by using Erase
+        Erase FilteredSensors
+    End If
+    
+    ' Clear temporary array
+    Erase tempArray
+End Sub
+
 
 

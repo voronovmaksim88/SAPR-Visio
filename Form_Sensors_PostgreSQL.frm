@@ -137,6 +137,7 @@ Private Sub UserForm_Initialize()
     If UBound(SensorMeasuredValues) < 0 Then ReadSensorMeasuredValue
     If UBound(SensorsTypes) < 0 Then ReadSensorsType
     If UBound(Sensors) < 0 Then ReadSensors
+    If UBound(SensorShapeTypes) < 0 Then ReadSensorsShapeType
     On Error GoTo 0
     
     FilterSensors

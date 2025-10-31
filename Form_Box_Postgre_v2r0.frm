@@ -15,6 +15,7 @@ Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
 
 
+
 Private isUpdatingComboBoxes As Boolean
 
 Private Sub ComboBox_D_Change()
@@ -369,7 +370,7 @@ Private Sub Fill_ComboBox_Manufacturer()
     ' Loop through Cabinets array to collect unique manufacturer IDs
     For i = LBound(FilteredControlCabinets) To UBound(FilteredControlCabinets)
         ' Only add if manufacturer_id is not 0 (non-Null)
-        If Cabinets(i).manufacturerID <> 0 Then
+        If FilteredControlCabinets(i).manufacturerID <> 0 Then
             uniqueManufacturers.Add FilteredControlCabinets(i).manufacturerID, CStr(FilteredControlCabinets(i).manufacturerID)
         End If
     Next i

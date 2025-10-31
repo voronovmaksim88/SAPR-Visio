@@ -32,12 +32,16 @@ End Sub
 
 
 
+
+
 Private Sub ComboBox_SensorType_Change()
     ' Prevent recursive calls during programmatic updates
     If isUpdatingFilters Then Exit Sub
     
     isUpdatingFilters = True
     FilterSensors
+    
+    Fill_ComboBox_Manufacturer
     Fill_ComboBox_SensorMeasuredValue
     Fill_ComboBox_Model
     Fill_ComboBox_Name
@@ -50,8 +54,24 @@ Private Sub ComboBox_SensorMeasuredValue_Change()
     
     isUpdatingFilters = True
     FilterSensors
+    
+    Fill_ComboBox_Manufacturer
     Fill_ComboBox_SensorType
     Fill_ComboBox_Model
+    Fill_ComboBox_Name
+    isUpdatingFilters = False
+End Sub
+
+Private Sub ComboBox_Model_Change()
+    ' Prevent recursive calls during programmatic updates
+    If isUpdatingFilters Then Exit Sub
+    
+    isUpdatingFilters = True
+    FilterSensors
+    
+    Fill_ComboBox_Manufacturer
+    Fill_ComboBox_SensorType
+    Fill_ComboBox_SensorMeasuredValue
     Fill_ComboBox_Name
     isUpdatingFilters = False
 End Sub

@@ -77,6 +77,12 @@ Public Type SensorMeasuredValue
     Name As String
 End Type
 
+Public Type SensorShapeType
+    ID As Long          ' id (primary key)
+    Name As String
+    ShapeCode As String ' (TE, PE, TS, PS ....)
+End Type
+
 Public Type SensorRecord
     ID As Long
     Name As String

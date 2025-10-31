@@ -27,6 +27,7 @@ Private Sub ComboBox_Manufacturer_Change()
     Fill_ComboBox_SensorMeasuredValue
     Fill_ComboBox_Model
     Fill_ComboBox_Name
+    SetSingleOptionIfAvailable
     isUpdatingFilters = False
 End Sub
 
@@ -45,6 +46,7 @@ Private Sub ComboBox_SensorType_Change()
     Fill_ComboBox_SensorMeasuredValue
     Fill_ComboBox_Model
     Fill_ComboBox_Name
+    SetSingleOptionIfAvailable
     isUpdatingFilters = False
 End Sub
 
@@ -59,6 +61,7 @@ Private Sub ComboBox_SensorMeasuredValue_Change()
     Fill_ComboBox_SensorType
     Fill_ComboBox_Model
     Fill_ComboBox_Name
+    SetSingleOptionIfAvailable
     isUpdatingFilters = False
 End Sub
 
@@ -73,6 +76,7 @@ Private Sub ComboBox_Model_Change()
     Fill_ComboBox_SensorType
     Fill_ComboBox_SensorMeasuredValue
     Fill_ComboBox_Name
+    SetSingleOptionIfAvailable
     isUpdatingFilters = False
 End Sub
 
@@ -113,6 +117,9 @@ Private Sub UserForm_Initialize()
     Fill_ComboBox_Model
     Fill_ComboBox_Name
     Fill_ComboBox_SensorMeasuredValue
+    
+    ' Set single options if available
+    SetSingleOptionIfAvailable
     
     ' Enable Change events after initialization is complete
     isUpdatingFilters = False
@@ -512,5 +519,38 @@ ErrorHandler:
     MsgBox "An error occurred while filling the measured value ComboBox: " & Err.Description, vbCritical, "Error"
     Set uniqueMeasuredValues = Nothing
 End Sub
+
+Private Sub SetSingleOptionIfAvailable()
+    ' Set single option for each ComboBox if only 2 items exist (all + 1 option)
+    isUpdatingFilters = True
+    
+    ' Check Manufacturer ComboBox
+    If ComboBox_Manufacturer.ListCount = 2 And ComboBox_Manufacturer.ListIndex = 0 Then
+        ComboBox_Manufacturer.ListIndex = 1
+    End If
+    
+    ' Check SensorType ComboBox
+    If ComboBox_SensorType.ListCount = 2 And ComboBox_SensorType.ListIndex = 0 Then
+        ComboBox_SensorType.ListIndex = 1
+    End If
+    
+    ' Check SensorMeasuredValue ComboBox
+    If ComboBox_SensorMeasuredValue.ListCount = 2 And ComboBox_SensorMeasuredValue.ListIndex = 0 Then
+        ComboBox_SensorMeasuredValue.ListIndex = 1
+    End If
+    
+    ' Check Model ComboBox
+    If ComboBox_Model.ListCount = 2 And ComboBox_Model.ListIndex = 0 Then
+        ComboBox_Model.ListIndex = 1
+    End If
+    
+    ' Check Name ComboBox
+    If ComboBox_Name.ListCount = 2 And ComboBox_Name.ListIndex = 0 Then
+        ComboBox_Name.ListIndex = 1
+    End If
+    
+    isUpdatingFilters = False
+End Sub
+
 
 

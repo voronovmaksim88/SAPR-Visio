@@ -107,10 +107,23 @@ End Sub
 Private Sub CommandButton_OK_Click()
     If (ComboBox_Model.Text <> "") Then
      ActiveWindow.Selection.PrimaryItem.Cells("prop.Manufacturer").FormulaU = Chr(34) + ComboBox_Manufacturer.Text + Chr(34)
+     
+    If ActiveWindow.Selection.PrimaryItem.CellExists("prop.SensorType", 0) Then
+    'to avoid errors
+        If (ComboBox_SensorType.Text = "Дискретный") Or (ComboBox_SensorType.Text = "Д") Then
+          ActiveWindow.Selection.PrimaryItem.Cells("Prop.SensorType").FormulaU = "1"
+         ElseIf (ComboBox_SensorType.Text = "Интерфейсный") Or (ComboBox_SensorType.Text = "И") Then
+          ActiveWindow.Selection.PrimaryItem.Cells("Prop.SensorType").FormulaU = "2"
+         Else
+          ActiveWindow.Selection.PrimaryItem.Cells("Prop.SensorType").FormulaU = "0"
+        End If
+    End If
+ 
     End If 'Model ComboBox is Empty
     
     Unload Form_Sensors_PostgreSQL
 End Sub
+
 
 Private Sub UserForm_Initialize()
     MyDebug = True

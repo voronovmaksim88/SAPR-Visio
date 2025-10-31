@@ -110,9 +110,9 @@ Private Sub CommandButton_OK_Click()
      
     If ActiveWindow.Selection.PrimaryItem.CellExists("prop.SensorType", 0) Then
     'to avoid errors
-        If (ComboBox_SensorType.Text = "Дискретный") Or (ComboBox_SensorType.Text = "Д") Then
+        If (ComboBox_SensorType.Text = "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ") Or (ComboBox_SensorType.Text = "пїЅ") Then
           ActiveWindow.Selection.PrimaryItem.Cells("Prop.SensorType").FormulaU = "1"
-         ElseIf (ComboBox_SensorType.Text = "Интерфейсный") Or (ComboBox_SensorType.Text = "И") Then
+         ElseIf (ComboBox_SensorType.Text = "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ") Or (ComboBox_SensorType.Text = "пїЅ") Then
           ActiveWindow.Selection.PrimaryItem.Cells("Prop.SensorType").FormulaU = "2"
          Else
           ActiveWindow.Selection.PrimaryItem.Cells("Prop.SensorType").FormulaU = "0"
